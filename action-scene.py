@@ -94,5 +94,5 @@ if __name__ == "__main__":
     with Hermes('localhost:1883') as h:
         h.subscribe_intent("iMartyn:listScenes",listScenes_received) \
          .subscribe_intent("iMartyn:sceneOn",sceneOn_received) \
-         .subscribe_intent("iMartyn:listSwitches",listScenes_received) \
+         .subscribe_intent("iMartyn:listSwitches",listSwitches_received) \
          .start()
