@@ -4,6 +4,7 @@
 import ConfigParser
 import urllib2
 import json
+import io
 from hermes_python.hermes import Hermes
 
 global global_conf
@@ -24,13 +25,16 @@ def read_configuration_file(configuration_file):
     except (IOError, ConfigParser.Error) as e:
         return dict()
 
+def getSceneNames(base_url):
+    return dict()
+
 def listScenes_received(hermes, intent_message):
     print('Intent {}'.format(intent_message.intent))
 
     for (slot_value, slot) in intent_message.slots.items():
         print('Slot {} -> \n\tRaw: {} \tValue: {}'.format(slot_value, slot[0].raw_value, slot[0].slot_value.value.value))
 
-    response = urllib2.urlopen('http://domoticz.k.mar1.uk/json.htm?type=scenes')
+    response = urllib2.urlopen(global_conf.get("secret").get("domoticz url")+'/json.htm?type=scenes')
     jsonresponse = json.load(response)
     sentence = "I found these scenes, "
     print jsonresponse["result"]
@@ -40,5 +44,6 @@ def listScenes_received(hermes, intent_message):
 
 if __name__ == "__main__":
     global_conf = read_configuration_file(CONFIG_INI)
+    print global_conf
     with Hermes('localhost:1883') as h:
         h.subscribe_intent("iMartyn:listScenes",listScenes_received).start()
