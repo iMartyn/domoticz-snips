@@ -5,9 +5,11 @@ import ConfigParser
 import urllib2
 import json
 import io
+import fuzzy
 from hermes_python.hermes import Hermes
 
 global global_conf
+global domoticz_base_url
 
 CONFIGURATION_ENCODING_FORMAT = "utf-8"
 CONFIG_INI = "config.ini"
@@ -26,7 +28,12 @@ def read_configuration_file(configuration_file):
         return dict()
 
 def getSceneNames(base_url):
-    return dict()
+    response = urllib2.urlopen(global_conf.get("secret").get("domoticz url")+'/json.htm?type=scenes')
+    jsonresponse = json.load(response)
+    allscenes = dict()
+    for scene in jsonresponse["result"]:
+        allscenes[scene["idx"]] = scene["Name"]
+    return allscenes
 
 def listScenes_received(hermes, intent_message):
     print('Intent {}'.format(intent_message.intent))
@@ -34,16 +41,15 @@ def listScenes_received(hermes, intent_message):
     for (slot_value, slot) in intent_message.slots.items():
         print('Slot {} -> \n\tRaw: {} \tValue: {}'.format(slot_value, slot[0].raw_value, slot[0].slot_value.value.value))
 
-    response = urllib2.urlopen(global_conf.get("secret").get("domoticz url")+'/json.htm?type=scenes')
-    jsonresponse = json.load(response)
     sentence = "I found these scenes, "
-    print jsonresponse["result"]
-    for scene in jsonresponse["result"]:
-       sentence = sentence + ", "+scene["Name"]
+    scenes = getSceneNames(domoticz_base_url)
+    print scenes
+    for idx,scene in scenes.items():
+       sentence = sentence + ", "+scene
     hermes.publish_end_session(intent_message.session_id, sentence)
 
 if __name__ == "__main__":
     global_conf = read_configuration_file(CONFIG_INI)
-    print global_conf
+    domoticz_base_url = global_conf.get("secret").get("domoticz url")
     with Hermes('localhost:1883') as h:
         h.subscribe_intent("iMartyn:listScenes",listScenes_received).start()
