@@ -36,17 +36,18 @@ def getSceneNames(base_url):
     return allscenes
 
 def listScenes_received(hermes, intent_message):
-    print('Intent {}'.format(intent_message.intent))
-
-    for (slot_value, slot) in intent_message.slots.items():
-        print('Slot {} -> \n\tRaw: {} \tValue: {}'.format(slot_value, slot[0].raw_value, slot[0].slot_value.value.value))
-
     sentence = "I found these scenes, "
     scenes = getSceneNames(domoticz_base_url)
     print scenes
     for idx,scene in scenes.items():
        sentence = sentence + ", "+scene
     hermes.publish_end_session(intent_message.session_id, sentence)
+
+def sceneOn_received(hermes, intent_message):
+    print('Intent {}'.format(intent_message.intent))
+
+    for (slot_value, slot) in intent_message.slots.items():
+        print('Slot {} -> \n\tRaw: {} \tValue: {}'.format(slot_value, slot[0].raw_value, slot[0].slot_value.value.value))
 
 if __name__ == "__main__":
     global_conf = read_configuration_file(CONFIG_INI)
