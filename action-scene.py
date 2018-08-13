@@ -54,7 +54,7 @@ def listScenes_received(hermes, intent_message):
 
 def listSwitches_received(hermes, intent_message):
     sentence = "I found these switches, "
-    switches = getSceneNames(domoticz_base_url)
+    switches = getSwitchNames(domoticz_base_url)
     print switches
     for idx,switch in switches.items():
        sentence = sentence + ", "+switch
